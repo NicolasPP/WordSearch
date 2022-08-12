@@ -24,24 +24,108 @@ class WordProvider {
             .create<WordApi>()
     }
 
-    fun fetchWord(query : String) {
-        retrofit.fetchWords(query).enqueue(object : Callback<List<WordItem>>{
+    fun fetchRelatedWords(
+        dataResult : DataMuseResult,
+        inputString : String,
+        max : Int,
+        vocab : String){
+        retrofit.fetchRelatedWords(inputString, max.toString(), vocab).enqueue(object : Callback<List<WordItem>>{
             override fun onResponse(
                 call: Call<List<WordItem>>,
                 response: Response<List<WordItem>>
             ) {
                 if (response.isSuccessful && response.body() != null){
-                    Log.d(TAG, "Response : ${response.body()}" )
-//                    cb.onDataFetchedSuccess(response.body()!!)
+                    Log.d(TAG, "fetching related words was successful")
+                    Log.d(TAG, "Response body { $inputString }: ${response.body()}")
+                    dataResult.onDataFetchedSuccess(response.body()!!)
                 }else{
-//                    cb.onDataFetchedFailed()
+                    dataResult.onDataFetchedFailed()
                 }
             }
 
             override fun onFailure(call: Call<List<WordItem>>, t: Throwable) {
-                Log.e(TAG, "Error loading images", t)
-//                cb.onDataFetchedFailed()
+                Log.e(TAG, "Error fetching related words failed", t)
+                dataResult.onDataFetchedFailed()
             }
+        })
+    }
+    fun fetchLeadingWords(
+        dataResult : DataMuseResult,
+        inputString : String,
+        max : Int,
+        vocab : String){
+        retrofit.fetchLeadingWords(inputString, max.toString(), vocab).enqueue(object : Callback<List<WordItem>>{
+            override fun onResponse(
+                call: Call<List<WordItem>>,
+                response: Response<List<WordItem>>
+            ) {
+                if (response.isSuccessful && response.body() != null){
+                    Log.d(TAG, "fetching related words was successful")
+                    Log.d(TAG, "Response body { $inputString }: ${response.body()}")
+                    dataResult.onDataFetchedSuccess(response.body()!!)
+                }else{
+                    dataResult.onDataFetchedFailed()
+                }
+            }
+
+            override fun onFailure(call: Call<List<WordItem>>, t: Throwable) {
+                Log.e(TAG, "Error fetching leading words failed", t)
+                dataResult.onDataFetchedFailed()
+            }
+
+        })
+    }
+    fun fetchTrailingWords(
+        dataResult : DataMuseResult,
+        inputString : String,
+        max : Int,
+        vocab : String){
+        retrofit.fetchTrailingWords(inputString, max.toString(), vocab).enqueue(object : Callback<List<WordItem>>{
+            override fun onResponse(
+                call: Call<List<WordItem>>,
+                response: Response<List<WordItem>>
+            ) {
+                if (response.isSuccessful && response.body() != null){
+                    Log.d(TAG, "fetching Trailing words was successful")
+                    Log.d(TAG, "Response body { $inputString }: ${response.body()}")
+                    dataResult.onDataFetchedSuccess(response.body()!!)
+                }else{
+                    dataResult.onDataFetchedFailed()
+                }
+            }
+
+            override fun onFailure(call: Call<List<WordItem>>, t: Throwable) {
+                Log.e(TAG, "Error fetching trailing words failed", t)
+                dataResult.onDataFetchedFailed()
+            }
+
+        })
+    }
+
+    fun fetchSynonymousWords(
+        dataResult : DataMuseResult,
+        inputString : String,
+        max : Int,
+        vocab : String){
+        retrofit.fetchSynWords(inputString, max.toString(), vocab).enqueue(object : Callback<List<WordItem>>{
+            override fun onResponse(
+                call: Call<List<WordItem>>,
+                response: Response<List<WordItem>>
+            ) {
+                if (response.isSuccessful && response.body() != null){
+                    Log.d(TAG, "fetching synonymous words was successful")
+                    Log.d(TAG, "Response body { $inputString }: ${response.body()}")
+                    dataResult.onDataFetchedSuccess(response.body()!!)
+                }else{
+                    dataResult.onDataFetchedFailed()
+                }
+            }
+
+            override fun onFailure(call: Call<List<WordItem>>, t: Throwable) {
+                Log.e(TAG, "Error fetching synonymous words failed", t)
+                dataResult.onDataFetchedFailed()
+            }
+
         })
     }
 
