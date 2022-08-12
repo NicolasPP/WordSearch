@@ -1,0 +1,14 @@
+<svg width="48.00000000000001" height="48.00000000000001" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_23">
+   <rect x="0.125" y="0" stroke-width="0" id="svg_1" height="48" width="48" stroke="#000" fill="#fff"/>
+   <ellipse stroke-width="0.5" ry="15" rx="15" id="svg_2" cy="15.25" cx="15.25" stroke="#000" fill="#fff"/>
+  </g>
+  <g id="svg_22">
+   <rect transform="rotate(39 30.2725 32.2379)" stroke="#000" id="svg_15" height="11.23472" width="37.58604" y="26.6205" x="11.47946" stroke-width="0" fill="#ffffff"/>
+   <text transform="rotate(39 30.2842 32.2189)" stroke="#000" xml:space="preserve" text-anchor="start" font-family="monospace" font-size="7" id="svg_14" y="34.59394" x="12.96776" stroke-width="0" fill="#000000">w o r d s</text>
+  </g>
+ </g>
+</svg>
