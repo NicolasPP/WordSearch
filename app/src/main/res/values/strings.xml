@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Word Search</string>
+
+<!--  Home Activity  -->
+    <string name="Home">Home</string>
+    <string name="LeaderBoard">LeaderBoard</string>
+    <string name="Settings">Settings</string>
+
 </resources>
