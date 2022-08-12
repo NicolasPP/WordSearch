@@ -16,11 +16,6 @@ const val ES_VOCAB : String = "es"
 class HomeActivity : AppCompatActivity(), DataMuseResult {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        val provider : WordProvider = WordProvider()
-//        provider.fetchRelatedWords(this, "car", 10, EN_WIKI)
-//        provider.fetchLeadingWords(this, "wreak", 10, EN_WIKI)
-//        provider.fetchTrailingWords(this, "havoc", 10, EN_WIKI)
-//        provider.fetchSynonymousWords(this, "bright", 10, EN_WIKI)
         setContent {
             MaterialTheme {
                 MessageCard("Nicolas")
