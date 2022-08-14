@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -13,7 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
@@ -47,8 +48,11 @@ class HomeActivity : AppCompatActivity() {
                     ){
                 //                Main home page column
                 val rNavController = rememberNavController()
+                val backGroundColor = MaterialTheme.colors.background
                 Scaffold(
-                    bottomBar = { AddBottomNavigationBar(rNavController) },
+                    bottomBar = { AddBottomAppBar(rNavController) },
+                    floatingActionButtonPosition = FabPosition.Center,
+                    isFloatingActionButtonDocked = true,
                     floatingActionButton = { AddPlayButton() }
                 ){
                     Column(
@@ -65,46 +69,38 @@ class HomeActivity : AppCompatActivity() {
 
 @Composable
 fun AddHomePage(
-    isDarkTheme: MutableState<Boolean>
+    isDarkTheme: MutableState<Boolean>,
 ){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.primary),
+            .background(MaterialTheme.colors.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround
+        verticalArrangement = Arrangement.Bottom
     ){
         Image(
             painter = painterResource(id = if (isDarkTheme.value)
-                R.drawable.app_logo_black_background else R.drawable.app_logo_white_background),
+                R.drawable.app_logo_dark_background else R.drawable.app_logo_light_background),
             contentDescription = "Logo",
             modifier = Modifier
-                .size(200.dp, 200.dp)
-                .border(1.dp, color = MaterialTheme.colors.primary, shape = RectangleShape))
+                .offset(y = 80.dp)
+                .size(300.dp, 300.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colors.background,
+                    shape = RectangleShape))
 
+        Image(
+            painter = painterResource(id = R.drawable.search_word),
+            contentDescription = "Logo",
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+            modifier = Modifier
+                .size(250.dp, 250.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colors.background,
+                    shape = RectangleShape))
 
-//        Button(
-//            onClick = {},
-//            shape = RoundedCornerShape(25.dp),
-//            modifier = Modifier
-//                .width(200.dp)
-//                .background(MaterialTheme.colors.primary),
-//            border = BorderStroke(1.dp, MaterialTheme.colors.onPrimary),
-//        ){
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth(),
-//
-//                ){
-//                Image(
-//                    painter = painterResource(id = R.drawable.play_arrow_48px),
-//                    contentDescription = "play",
-//                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary),
-//                    modifier = Modifier
-//                        .size(24.dp)
-//                )
-//            }
-//        }
     }
 
 }
@@ -114,8 +110,17 @@ fun AddHomePage(
 fun AddAppLogo(){}
 @Composable
 fun AddPlayButton(){
-    FloatingActionButton(onClick = { /*TODO*/ }) {
-        Image(painter = painterResource(id = R.drawable.play_arrow_48px), contentDescription = "play")
+    FloatingActionButton(
+        onClick = { /*TODO*/ }
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.play_arrow_48px),
+            contentDescription = "play",
+            alignment = Alignment.Center,
+            modifier = Modifier
+                .size(56.dp)
+                .background(MaterialTheme.colors.primary),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.background))
     }
 }
 @Composable
@@ -124,55 +129,60 @@ fun AddNavContent(
     isDarkTheme: MutableState<Boolean>
 ) {
     NavHost(navController, startDestination = BottomNavigationScreen.Home.route) {
+        composable(BottomNavigationScreen.LeaderBoard.route) {
+//           AddLeaderBoardScreen(isDarkTheme = isDarkTheme)
+            AddSettingsScreen(isDarkTheme = isDarkTheme)
+        }
+        
+
         composable(BottomNavigationScreen.Home.route) {
             AddHomePage(isDarkTheme = isDarkTheme)
-        }
-
-        composable(BottomNavigationScreen.LeaderBoard.route) {
-           AddLeaderBoardScreen(isDarkTheme = isDarkTheme)
-        }
-
-        composable(BottomNavigationScreen.Settings.route) {
-            AddSettingsScreen(isDarkTheme = isDarkTheme)
         }
     }
 }
 @Composable
-fun AddBottomNavigationBar(nhc : NavHostController){
-    
+fun AddBottomAppBar(nhc : NavHostController){
+
     val pages = listOf(
         BottomNavigationScreen.Home,
-        BottomNavigationScreen.LeaderBoard,
-        BottomNavigationScreen.Settings
+        BottomNavigationScreen.LeaderBoard
     )
-    
+
     val currentIndex = remember { mutableStateOf(0) }
-    
-    BottomNavigation(
+
+    BottomAppBar(
         modifier = Modifier
-            .background(Color.White)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colors.background),
+        cutoutShape = MaterialTheme.shapes.small.copy(
+            CornerSize(percent = 50)
+        )
     ) {
+
         pages.forEachIndexed{ pageIndex, page ->
-            
+
             val isPageSelected = currentIndex.value == pageIndex
             BottomNavigationItem(
                 icon = {
                     Icon(
                         painter = painterResource( id = page.drawResId ),
                         contentDescription = stringResource(id = page.stringResId),
+                        modifier = Modifier
+                            .size(30.dp)
                     )
                 },
-                label = {
-                    Text(
-                        stringResource(id = page.stringResId)
-                    )
-                },
+//                label = {
+//                    Text(
+//                        stringResource(id = page.stringResId)
+//                    )
+//                },
                 selected = isPageSelected,
-                selectedContentColor = MaterialTheme.colors.onPrimary,
+                selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = MaterialTheme.colors.secondary,
                 alwaysShowLabel = true,
                 modifier =Modifier
-                    .background(MaterialTheme.colors.primary),
+                    .background(MaterialTheme.colors.onBackground),
                 onClick = {
                     if (!isPageSelected){
                         currentIndex.value = pageIndex

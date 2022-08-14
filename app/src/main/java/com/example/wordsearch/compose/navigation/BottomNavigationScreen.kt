@@ -9,7 +9,6 @@ sealed class BottomNavigationScreen(
     @StringRes val stringResId : Int,
     @DrawableRes val drawResId : Int
 ) {
-    object Home : BottomNavigationScreen("Home", R.string.Home, R.drawable.home_icon_24)
     object LeaderBoard : BottomNavigationScreen("LeaderBoard", R.string.LeaderBoard, R.drawable.trophy_icon_24)
-    object Settings : BottomNavigationScreen("Settings", R.string.Settings, R.drawable.settings_icon_24)
+    object Home : BottomNavigationScreen("Home", R.string.Settings, R.drawable.home_icon_24)
 }

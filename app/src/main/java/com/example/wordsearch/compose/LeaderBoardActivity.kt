@@ -25,7 +25,7 @@ fun AddLeaderBoardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.primary)
+            .background(MaterialTheme.colors.onBackground)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -33,7 +33,7 @@ fun AddLeaderBoardScreen(
 
         Text(
             text = stringResource(id = R.string.LeaderBoard),
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colors.secondaryVariant,
             fontSize = 19.sp,
             fontStyle = FontStyle.Normal
         )

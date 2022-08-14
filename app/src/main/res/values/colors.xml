@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <!--  LOGO  DARK COLORS  -->
+    <color name="logoDarkBG">#FF172227</color>
+    <color name="logoDarkFG">#FF417194</color>
+
+    <!--  LOGO LIGHT COLORS  -->
+    <color name="logoLightBG">#FFB1C8C7</color>
+    <color name="logoLightFG">#FFD6A692</color>
+
 </resources>
