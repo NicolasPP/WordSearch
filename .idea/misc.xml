@@ -4,14 +4,21 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/app_logo.xml" value="0.25" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/app_logo_black_background.xml" value="0.1835" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/app_logo_white_background.xml" value="0.1795" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/baseline_emoji_events_24.xml" value="0.134" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/baseline_home_24.xml" value="0.134" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/baseline_settings_24.xml" value="0.134" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/circle-48px.xml" value="0.127" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/circle_not_whole_svg.xml" value="0.1935" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/home_icon_24.xml" value="0.1795" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/logo.xml" value="0.2445" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/menu-48px.xml" value="0.127" />
         <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/outline_location_on_24.xml" value="0.134" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/play_arrow-48px.xml" value="0.1405" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/play_arrow_black_48px.xml" value="0.1405" />
+        <entry key="..\:/Users/nicol/AndroidStudioProjects/WordSearch/app/src/main/res/drawable/play_arrow_white_48px.xml" value="0.1405" />
       </map>
     </option>
   </component>
