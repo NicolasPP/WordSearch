@@ -1,6 +1,9 @@
 package com.example.wordsearch.compose
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
@@ -12,22 +15,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wordsearch.R
-import com.example.wordsearch.compose.navigation.BottomNavigationScreen
+import com.example.wordsearch.compose.navigation.HomeNavigation
+import com.example.wordsearch.compose.GameConfigActivity
 import com.example.wordsearch.compose.themes.colorDarkPalette
 import com.example.wordsearch.compose.themes.colorLightPalette
 import kotlinx.coroutines.CoroutineScope
@@ -41,47 +47,75 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             val isDarkTheme = remember {
                 mutableStateOf(false)
             }
+            val settingIconPos = remember {
+                mutableStateOf(0F)
+            }
 
-            MaterialTheme (
-                colors = if (isDarkTheme.value) colorDarkPalette else colorLightPalette
-                    ){
-                //                Main home page column
-                val rNavController = rememberNavController()
-                val scaffoldState = rememberScaffoldState()
-                val scope = rememberCoroutineScope()
-                Scaffold(
+            val rNavController = rememberNavController()
+            val scaffoldState = rememberScaffoldState()
+            val scope = rememberCoroutineScope()
+
+            AddContent(
+                isDarkTheme = isDarkTheme,
+                scaffoldState = scaffoldState,
+                scope = scope,
+                settingIconPos = settingIconPos,
+                rNavController =rNavController
+            )
+
+        }
+    }
+}
+@Composable
+fun AddContent(
+    isDarkTheme : MutableState<Boolean>,
+    scaffoldState: ScaffoldState,
+    scope: CoroutineScope,
+    settingIconPos: MutableState<Float>,
+    rNavController : NavHostController,
+
+    ){
+    val context = LocalContext.current
+    MaterialTheme (
+        colors = if (isDarkTheme.value) colorDarkPalette else colorLightPalette
+    ){
+        //                Main home page column
+        Scaffold(
+            scaffoldState = scaffoldState,
+            topBar = {
+                AddTopAppBar(
                     scaffoldState = scaffoldState,
-                    topBar = { AddTopAppBar(
-                        scaffoldState = scaffoldState,
-                        scope = scope
-                    )},
-                    drawerContent = {
-                        AddSettingsScreen(isDarkTheme = isDarkTheme)
-                    },
-                    bottomBar = { AddBottomAppBar(rNavController)},
-                    floatingActionButton = { AddFloatingAction(
-                        iconId = R.drawable.play_arrow_48px,
-                        dpSize = 56,
-                        bgColor = MaterialTheme.colors.primary,
-                        fgColor = MaterialTheme.colors.background,
-                        cDescription = "play",
-                        modifier = Modifier
-                    ){}},
-                    drawerShape = customShape(),
-                    floatingActionButtonPosition = FabPosition.Center,
-                    isFloatingActionButtonDocked = true
-                ){
-                    Column(
-                        modifier = Modifier
-                            .padding(bottom = it.calculateBottomPadding())
-                        ){
-                        AddNavContent(navController = rNavController, isDarkTheme)
-                    }
-                }
+                    scope = scope,
+                    settingIconPos = if (scaffoldState.drawerState.isOpen) settingIconPos.value else 0.0f
+                )},
+            drawerContent = {
+                AddSettingsScreen(isDarkTheme = isDarkTheme)
+            },
+            bottomBar = { AddBottomAppBar(rNavController)},
+            floatingActionButton = { AddFloatingAction(
+                iconId = R.drawable.play_arrow_48px,
+                dpSize = 56,
+                bgColor = MaterialTheme.colors.primary,
+                fgColor = MaterialTheme.colors.background,
+                cDescription = "play",
+                modifier = Modifier,
+            ){
+                val intent = Intent(context, GameConfigActivity::class.java)
+                intent.putExtra("isDarkThemeVal", isDarkTheme.value)
+                context.startActivity(intent)
+            }},
+            drawerShape = customShape(settingIconPos),
+            floatingActionButtonPosition = FabPosition.Center,
+            isFloatingActionButtonDocked = true
+        ){
+            Column(
+                modifier = Modifier
+                    .padding(bottom = it.calculateBottomPadding())
+            ){
+                AddNavContent(navController = rNavController, isDarkTheme)
             }
         }
     }
@@ -98,6 +132,7 @@ fun AddHomePage(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ){
+
         Image(
             painter = painterResource(id = if (isDarkTheme.value)
                 R.drawable.app_logo_dark_background else R.drawable.app_logo_light_background),
@@ -128,12 +163,16 @@ fun AddHomePage(
 }
 
 @Composable
-fun customShape() = object : Shape {
+fun customShape(
+    settingIconPos: MutableState<Float>
+) = object : Shape {
     override fun createOutline(
         size: Size,
         layoutDirection: LayoutDirection,
         density: Density
     ): Outline {
+        settingIconPos.value = size.width * 2 / 3
+
         return Outline.Rectangle(
             Rect(
                 left = 0f,
@@ -144,6 +183,7 @@ fun customShape() = object : Shape {
         )
     }
 }
+
 @Composable
 fun AddFloatingAction(
     iconId : Int,
@@ -169,39 +209,45 @@ fun AddFloatingAction(
     }
 }
 
+
 @Composable
 fun AddNavContent(
     navController: NavHostController,
-    isDarkTheme: MutableState<Boolean>
+    isDarkTheme: MutableState<Boolean>,
 ) {
-    NavHost(navController, startDestination = BottomNavigationScreen.Home.route) {
-        composable(BottomNavigationScreen.LeaderBoard.route) {
+    NavHost(navController, startDestination = HomeNavigation.Home.route) {
+        composable(HomeNavigation.LeaderBoard.route) {
            AddLeaderBoardScreen(isDarkTheme = isDarkTheme)
         }
-        
 
-        composable(BottomNavigationScreen.Home.route) {
+        composable(HomeNavigation.Home.route) {
             AddHomePage(isDarkTheme = isDarkTheme)
         }
     }
 }
+
 @Composable
 fun AddTopAppBar(
     scaffoldState: ScaffoldState,
-    scope : CoroutineScope
+    scope : CoroutineScope,
+    settingIconPos : Float
 ){
     TopAppBar(
-        backgroundColor  = MaterialTheme.colors.onBackground ,
+        backgroundColor  = MaterialTheme.colors.onBackground,
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(30.dp))
             .background(MaterialTheme.colors.onBackground)
             .padding(start = 8.dp, end = 8.dp)
             ){
+        val size = with (LocalDensity.current){ settingIconPos.toDp()}
         Column(
             verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(start = size)
         ){
+            Log.d(TAG, size.toString())
             AddFloatingAction(
                 iconId = R.drawable.menu_48px,
                 dpSize = 50,
@@ -224,8 +270,8 @@ fun AddTopAppBar(
 fun AddBottomAppBar(nhc : NavHostController){
 
     val pages = listOf(
-        BottomNavigationScreen.Home,
-        BottomNavigationScreen.LeaderBoard
+        HomeNavigation.Home,
+        HomeNavigation.LeaderBoard
     )
 
     val currentIndex = remember { mutableStateOf(0) }
