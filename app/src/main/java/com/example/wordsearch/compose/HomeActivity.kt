@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
@@ -29,6 +27,8 @@ import com.example.wordsearch.R
 import com.example.wordsearch.compose.navigation.BottomNavigationScreen
 import com.example.wordsearch.compose.themes.colorDarkPalette
 import com.example.wordsearch.compose.themes.colorLightPalette
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 const val EN_WIKI : String = "enwiki"
 const val ES_VOCAB : String = "es"
@@ -40,7 +40,7 @@ class HomeActivity : AppCompatActivity() {
         setContent {
 
             val isDarkTheme = remember {
-                mutableStateOf(true)
+                mutableStateOf(false)
             }
 
             MaterialTheme (
@@ -48,12 +48,28 @@ class HomeActivity : AppCompatActivity() {
                     ){
                 //                Main home page column
                 val rNavController = rememberNavController()
-                val backGroundColor = MaterialTheme.colors.background
+                val scaffoldState = rememberScaffoldState()
+                val scope = rememberCoroutineScope()
                 Scaffold(
-                    bottomBar = { AddBottomAppBar(rNavController) },
+                    scaffoldState = scaffoldState,
+                    topBar = { AddTopAppBar(
+                        scaffoldState = scaffoldState,
+                        scope = scope
+                    )},
+                    drawerContent = {
+                        AddSettingsScreen(isDarkTheme = isDarkTheme)
+                    },
+                    bottomBar = { AddBottomAppBar(rNavController)},
+                    floatingActionButton = { AddFloatingAction(
+                        iconId = R.drawable.play_arrow_48px,
+                        dpSize = 56,
+                        bgColor = MaterialTheme.colors.primary,
+                        fgColor = MaterialTheme.colors.background,
+                        cDescription = "play",
+                        modifier = Modifier
+                    ){}},
                     floatingActionButtonPosition = FabPosition.Center,
-                    isFloatingActionButtonDocked = true,
-                    floatingActionButton = { AddPlayButton() }
+                    isFloatingActionButtonDocked = true
                 ){
                     Column(
                         modifier = Modifier
@@ -88,7 +104,8 @@ fun AddHomePage(
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colors.background,
-                    shape = RectangleShape))
+                    shape = RectangleShape
+                ))
 
         Image(
             painter = painterResource(id = R.drawable.search_word),
@@ -99,30 +116,37 @@ fun AddHomePage(
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colors.background,
-                    shape = RectangleShape))
+                    shape = RectangleShape
+                ))
 
     }
 
 }
-
-
 @Composable
-fun AddAppLogo(){}
-@Composable
-fun AddPlayButton(){
+fun AddFloatingAction(
+    iconId : Int,
+    dpSize : Int,
+    bgColor : Color,
+    fgColor : Color,
+    cDescription : String,
+    modifier: Modifier,
+    onClick: () -> Unit
+    ){
     FloatingActionButton(
-        onClick = { /*TODO*/ }
+        onClick = onClick,
+        modifier = modifier,
     ) {
         Image(
-            painter = painterResource(id = R.drawable.play_arrow_48px),
-            contentDescription = "play",
+            painter = painterResource(id = iconId),
+            contentDescription = cDescription,
             alignment = Alignment.Center,
             modifier = Modifier
-                .size(56.dp)
-                .background(MaterialTheme.colors.primary),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.background))
+                .size(dpSize.dp)
+                .background(bgColor),
+            colorFilter = ColorFilter.tint(fgColor))
     }
 }
+
 @Composable
 fun AddNavContent(
     navController: NavHostController,
@@ -130,8 +154,7 @@ fun AddNavContent(
 ) {
     NavHost(navController, startDestination = BottomNavigationScreen.Home.route) {
         composable(BottomNavigationScreen.LeaderBoard.route) {
-//           AddLeaderBoardScreen(isDarkTheme = isDarkTheme)
-            AddSettingsScreen(isDarkTheme = isDarkTheme)
+           AddLeaderBoardScreen(isDarkTheme = isDarkTheme)
         }
         
 
@@ -140,6 +163,41 @@ fun AddNavContent(
         }
     }
 }
+@Composable
+fun AddTopAppBar(
+    scaffoldState: ScaffoldState,
+    scope : CoroutineScope
+){
+    TopAppBar(
+        backgroundColor  = MaterialTheme.colors.onBackground ,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(30.dp))
+            .background(MaterialTheme.colors.onBackground)
+            .padding(start = 8.dp, end = 8.dp)
+            ){
+        Column(
+            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            AddFloatingAction(
+                iconId = R.drawable.menu_48px,
+                dpSize = 50,
+                bgColor = MaterialTheme.colors.primary,
+                fgColor = MaterialTheme.colors.background,
+                modifier = Modifier
+                    .size(40.dp),
+                cDescription = "Settings"){
+                scope.launch {
+                    scaffoldState.drawerState.apply {
+                        if (isClosed) open() else close()
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun AddBottomAppBar(nhc : NavHostController){
 
@@ -157,7 +215,7 @@ fun AddBottomAppBar(nhc : NavHostController){
             .background(MaterialTheme.colors.background),
         cutoutShape = MaterialTheme.shapes.small.copy(
             CornerSize(percent = 50)
-        )
+        ),
     ) {
 
         pages.forEachIndexed{ pageIndex, page ->
@@ -172,11 +230,6 @@ fun AddBottomAppBar(nhc : NavHostController){
                             .size(30.dp)
                     )
                 },
-//                label = {
-//                    Text(
-//                        stringResource(id = page.stringResId)
-//                    )
-//                },
                 selected = isPageSelected,
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = MaterialTheme.colors.secondary,
