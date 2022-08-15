@@ -11,8 +11,8 @@ val transparent = Color.Transparent
 // light pallet exclusive
 val darkGray = Color.DarkGray
 val donBrown = Color(0xFFA39081) // darkest
-val tan = Color(0xFFD6A692)
-val chamois = Color(0xFFEFD9b4)
+val tan = Color(0xFF94553D)
+val chamois = Color(0xFFBD8E83)
 val opal = Color(0xFFB1C8C7)
 val beige = Color(0xFFF5F4DE) // lightest
 
@@ -28,7 +28,7 @@ val lighterBlue = Color(0xFF417194) // lightest
 
 val colorDarkPalette = darkColors(
     primary = lighterBlue, // contrast with main background color
-    primaryVariant = black,
+    primaryVariant = blue,
     secondary = darkGray, // unselected color
     secondaryVariant = black,
     background = darkBlue2, // Main background color
@@ -43,7 +43,7 @@ val colorDarkPalette = darkColors(
 
 val colorLightPalette = darkColors(
     primary = tan,// contrast with main background color
-    primaryVariant = white,
+    primaryVariant = beige,
     secondary = lightGray, // unselected color
     secondaryVariant = white,
     background = opal, // Main background color

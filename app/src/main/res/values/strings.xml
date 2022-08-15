@@ -7,4 +7,8 @@
     <string name="Settings">Settings</string>
     <string name="play">Play</string>
 
+<!--  Settings Activity  -->
+    <string name="Theme">Theme</string>
+    <string name="Dark">Dark</string>
+    <string name="Light">Light</string>
 </resources>
