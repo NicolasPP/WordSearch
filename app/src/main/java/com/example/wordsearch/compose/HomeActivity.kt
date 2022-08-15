@@ -46,9 +46,10 @@ const val TAG = "HomeActivity"
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val isDark = isDarkTheme()
         setContent {
             val isDarkTheme = remember {
-                mutableStateOf(false)
+                mutableStateOf(isDark)
             }
             val settingIconPos = remember {
                 mutableStateOf(0F)
@@ -67,6 +68,12 @@ class HomeActivity : AppCompatActivity() {
             )
 
         }
+    }
+
+    private fun isDarkTheme() : Boolean {
+        return if (intent.extras?.containsKey("isDarkThemeVal") == true)
+            intent.extras!!.getBoolean("isDarkThemeVal", false)
+         else false
     }
 }
 @Composable
