@@ -12,11 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -68,6 +71,7 @@ class HomeActivity : AppCompatActivity() {
                         cDescription = "play",
                         modifier = Modifier
                     ){}},
+                    drawerShape = customShape(),
                     floatingActionButtonPosition = FabPosition.Center,
                     isFloatingActionButtonDocked = true
                 ){
@@ -121,6 +125,24 @@ fun AddHomePage(
 
     }
 
+}
+
+@Composable
+fun customShape() = object : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        return Outline.Rectangle(
+            Rect(
+                left = 0f,
+                top = 0f,
+                right = size.width * 2 / 3,
+                bottom = size.height
+            )
+        )
+    }
 }
 @Composable
 fun AddFloatingAction(
