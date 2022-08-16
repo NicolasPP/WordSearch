@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "30481367104",
+    "project_id": "word-search-b2a42",
+    "storage_bucket": "word-search-b2a42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:30481367104:android:ee5d42fda2ca7d53fd5fa5",
+        "android_client_info": {
+          "package_name": "com.nicolas.wordsearch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "30481367104-c65n6aauneis598n83cnt83ddiesrf11.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLGWx5-ee_99pIb9rMq1_0ik4peFz8zwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "30481367104-c65n6aauneis598n83cnt83ddiesrf11.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

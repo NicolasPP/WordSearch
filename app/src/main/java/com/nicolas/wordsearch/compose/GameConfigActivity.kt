@@ -1,9 +1,7 @@
-package com.example.wordsearch.compose
+package com.nicolas.wordsearch.compose
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import com.example.wordsearch.R
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -17,13 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.wordsearch.compose.themes.colorDarkPalette
-import com.example.wordsearch.compose.themes.colorLightPalette
+import com.nicolas.wordsearch.R
+import com.nicolas.wordsearch.compose.themes.colorDarkPalette
+import com.nicolas.wordsearch.compose.themes.colorLightPalette
 
 
 class GameConfigActivity : AppCompatActivity() {
@@ -71,9 +69,6 @@ fun AddContent(
                 modifier = Modifier
                     .padding(bottom = it.calculateBottomPadding())
             ){
-                Divider(Modifier
-                    .background(MaterialTheme.colors.background)
-                    .height(40.dp))
                 AddScaffoldContent()
             }
         }
@@ -99,6 +94,29 @@ fun AddBottomAppBar(){
 
 @Composable
 fun AddScaffoldContent(){
+    Divider(
+        Modifier
+            .background(MaterialTheme.colors.background)
+            .height(40.dp), color = MaterialTheme.colors.background)
+
+    AddThemeInputField()
+
+    Divider(
+        Modifier
+            .background(MaterialTheme.colors.background)
+            .height(40.dp), color = MaterialTheme.colors.background)
+
+    AddMultiButtonSingleChoice()
+
+}
+
+@Composable
+fun AddMultiButtonSingleChoice() {
+
+}
+
+@Composable
+fun AddThemeInputField(){
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -116,7 +134,7 @@ fun AddScaffoldContent(){
                 text.value = TextFieldValue(newText)
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.secondaryVariant,
+                backgroundColor = MaterialTheme.colors.primaryVariant,
                 textColor = MaterialTheme.colors.primary
             ),
             label = { Text(
@@ -132,9 +150,7 @@ fun AddScaffoldContent(){
             )}
         )
     }
-
 }
-
 
 @Composable
 fun AddTopAppBar(

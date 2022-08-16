@@ -1,12 +1,12 @@
-package com.example.wordsearch
+package com.nicolas.wordsearch
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wordsearch.data.DataMuseResult
-import com.example.wordsearch.data.WordProvider
-import com.example.wordsearch.model.WordItem
+import com.nicolas.wordsearch.data.WordProvider
+import com.nicolas.wordsearch.model.WordItem
+import com.nicolas.wordsearch.data.DataMuseResult
 
 const val TAG = "DataMuseViewModel"
 

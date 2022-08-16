@@ -1,6 +1,5 @@
-package com.example.wordsearch.compose
+package com.nicolas.wordsearch.compose
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -25,17 +24,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.wordsearch.R
-import com.example.wordsearch.compose.navigation.HomeNavigation
-import com.example.wordsearch.compose.GameConfigActivity
-import com.example.wordsearch.compose.themes.colorDarkPalette
-import com.example.wordsearch.compose.themes.colorLightPalette
+import com.nicolas.wordsearch.R
+import com.nicolas.wordsearch.compose.navigation.HomeNavigation
+import com.nicolas.wordsearch.compose.themes.colorDarkPalette
+import com.nicolas.wordsearch.compose.themes.colorLightPalette
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -99,7 +96,7 @@ fun AddContent(
                     settingIconPos = if (scaffoldState.drawerState.isOpen) settingIconPos.value else 0.0f
                 )},
             drawerContent = {
-                AddSettingsScreen(isDarkTheme = isDarkTheme)
+                AddSettingsScreen(isDarkTheme = isDarkTheme, settingIconPos)
             },
             bottomBar = { AddBottomAppBar(rNavController)},
             floatingActionButton = { AddFloatingAction(

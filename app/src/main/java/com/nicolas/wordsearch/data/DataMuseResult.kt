@@ -1,6 +1,6 @@
-package com.example.wordsearch.data
+package com.nicolas.wordsearch.data
 
-import com.example.wordsearch.model.WordItem
+import com.nicolas.wordsearch.model.WordItem
 
 interface DataMuseResult {
     fun onDataFetchedSuccess(words : List<WordItem>)

@@ -11,4 +11,5 @@
     <string name="Theme">Theme</string>
     <string name="Dark">Dark</string>
     <string name="Light">Light</string>
+    <string name="LogIn">LogIn</string>
 </resources>

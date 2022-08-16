@@ -1,6 +1,6 @@
-package com.example.wordsearch.data
+package com.nicolas.wordsearch.data
 
-import com.example.wordsearch.model.WordItem
+import com.nicolas.wordsearch.model.WordItem
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

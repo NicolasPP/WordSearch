@@ -1,6 +1,6 @@
-package com.example.wordsearch.data
+package com.nicolas.wordsearch.data
 import android.util.Log
-import com.example.wordsearch.model.WordItem
+import com.nicolas.wordsearch.model.WordItem
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.*

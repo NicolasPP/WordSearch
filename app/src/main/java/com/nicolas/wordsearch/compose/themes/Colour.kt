@@ -1,4 +1,4 @@
-package com.example.wordsearch.compose.themes
+package com.nicolas.wordsearch.compose.themes
 
 import androidx.compose.material.darkColors
 import androidx.compose.ui.graphics.Color

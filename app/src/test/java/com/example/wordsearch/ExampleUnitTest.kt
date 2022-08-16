@@ -1,4 +1,4 @@
-package com.example.wordsearch
+package com.nicolas.wordsearch
 
 import org.junit.Test
 

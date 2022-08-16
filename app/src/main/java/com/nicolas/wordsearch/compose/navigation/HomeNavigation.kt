@@ -1,8 +1,8 @@
-package com.example.wordsearch.compose.navigation
+package com.nicolas.wordsearch.compose.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.example.wordsearch.R
+import com.nicolas.wordsearch.R
 
 sealed class HomeNavigation(
     val route: String,

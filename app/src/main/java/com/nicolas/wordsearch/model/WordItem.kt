@@ -1,4 +1,4 @@
-package com.example.wordsearch.model
+package com.nicolas.wordsearch.model
 
 data class WordItem(
     val score: Int,
