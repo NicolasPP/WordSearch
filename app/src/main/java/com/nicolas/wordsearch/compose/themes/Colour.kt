@@ -35,10 +35,10 @@ val colorDarkPalette = darkColors(
     surface = transparent,
     error  = black,
     onPrimary = black,
-    onSecondary = black,
+    onSecondary = lightGray,
     onBackground = darkBlue1, // Secondary background color - darker
     onSurface = black,
-    onError = black,
+    onError = lightGray,
 )
 
 val colorLightPalette = darkColors(
@@ -50,8 +50,8 @@ val colorLightPalette = darkColors(
     surface = transparent,
     error  = white,
     onPrimary = white,
-    onSecondary = white,
+    onSecondary = lightGray,
     onBackground = donBrown, // Secondary background color - darker
     onSurface = white,
-    onError = white
+    onError = lightGray
 )
