@@ -19,14 +19,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nicolas.wordsearch.R
+import com.nicolas.wordsearch.data.repository.AppPreferences
 
 
 @Composable
 fun AddSettingsScreen(
     isDarkTheme: MutableState<Boolean>,
-    settingIconPos: MutableState<Float>
+    settingIconPos: MutableState<Float>,
+    appPreferences: AppPreferences
     ){
-    val loggedIn = remember { mutableStateOf(false) }
+    val isLogInPressed = remember { mutableStateOf(false) }
     val size = with (LocalDensity.current){ settingIconPos.value.toDp()}
 
     Column(
@@ -41,17 +43,19 @@ fun AddSettingsScreen(
         verticalArrangement = Arrangement.Top
     ) {
         AddThemeSwitch(
-            isDarkTheme
+            isDarkTheme,
+            appPreferences
         )
-        AddLogInButton( R.drawable.person_48px)
+        AddLogInButton( R.drawable.person_48px, isLogInPressed)
         AddLogInInputs("UserName")
-        AddLogInButton( R.drawable.outline_arrow_forward_24)
+        AddLogInButton( R.drawable.outline_arrow_forward_24, isLogInPressed)
     }
 }
 
 @Composable
 fun AddLogInButton(
-    iconId : Int
+    iconId : Int,
+    isLoggedIn : MutableState<Boolean>
 ){
     Row(
         modifier = Modifier
@@ -106,7 +110,8 @@ fun AddLogInInputs(
 
 @Composable
 fun AddThemeSwitch(
-    isDarkTheme: MutableState<Boolean>
+    isDarkTheme: MutableState<Boolean>,
+    appPreferences: AppPreferences
 ) {
     Row(
         modifier = Modifier
@@ -130,6 +135,7 @@ fun AddThemeSwitch(
             checked = isDarkTheme.value,
             onCheckedChange = {
                 isDarkTheme.value = it
+                appPreferences.setDarkTheme(it)
 
             },
             colors = SwitchDefaults.colors(

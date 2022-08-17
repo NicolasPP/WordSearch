@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -22,20 +25,16 @@ import androidx.compose.ui.unit.sp
 import com.nicolas.wordsearch.R
 import com.nicolas.wordsearch.compose.themes.colorDarkPalette
 import com.nicolas.wordsearch.compose.themes.colorLightPalette
+import com.nicolas.wordsearch.data.repository.AppPreferences
 
 
 class GameConfigActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val isDarkThemeVal = if (intent.extras?.containsKey("isDarkThemeVal") == true) {
-            intent.extras!!.getBoolean("isDarkThemeVal", false)
-        } else {
-            finish()
-            return
-        }
+        val appPreferences = AppPreferences(this)
         setContent{
             AddContent(
-                isDarkThemeVal = isDarkThemeVal
+                isDarkThemeVal = appPreferences.getDarkTheme()
             )
         }
     }
@@ -49,6 +48,7 @@ fun AddContent(
     MaterialTheme(
         colors = if (isDarkThemeVal) colorDarkPalette else colorLightPalette
     ){
+        val context = LocalContext.current
         Scaffold(
             bottomBar = { AddBottomAppBar()},
             floatingActionButton = {
@@ -60,6 +60,8 @@ fun AddContent(
                     cDescription = "play",
                     modifier = Modifier
                 ){
+                    val intent = Intent(context, GameActivity::class.java)
+                    context.startActivity(intent)
                 }},
             topBar = { AddTopAppBar(isDarkTheme = isDarkThemeVal) },
             floatingActionButtonPosition = FabPosition.End,
@@ -180,7 +182,6 @@ fun AddTopAppBar(
                     .size(40.dp),
                 cDescription = "Settings"){
                 val intent = Intent(context, HomeActivity::class.java)
-                intent.putExtra("isDarkThemeVal", isDarkTheme)
                 context.startActivity(intent)
             }
         }

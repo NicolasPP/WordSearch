@@ -33,6 +33,7 @@ import com.nicolas.wordsearch.R
 import com.nicolas.wordsearch.compose.navigation.HomeNavigation
 import com.nicolas.wordsearch.compose.themes.colorDarkPalette
 import com.nicolas.wordsearch.compose.themes.colorLightPalette
+import com.nicolas.wordsearch.data.repository.AppPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -43,11 +44,12 @@ const val TAG = "HomeActivity"
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val isDark = isDarkTheme()
+        val appPreferences = AppPreferences(this)
         setContent {
             val isDarkTheme = remember {
-                mutableStateOf(isDark)
+                mutableStateOf(appPreferences.getDarkTheme())
             }
+            isDarkTheme.value = appPreferences.getDarkTheme()
             val settingIconPos = remember {
                 mutableStateOf(0F)
             }
@@ -61,18 +63,14 @@ class HomeActivity : AppCompatActivity() {
                 scaffoldState = scaffoldState,
                 scope = scope,
                 settingIconPos = settingIconPos,
-                rNavController =rNavController
+                rNavController =rNavController,
+                appPreferences = appPreferences
             )
 
         }
     }
-
-    private fun isDarkTheme() : Boolean {
-        return if (intent.extras?.containsKey("isDarkThemeVal") == true)
-            intent.extras!!.getBoolean("isDarkThemeVal", false)
-         else false
-    }
 }
+
 @Composable
 fun AddContent(
     isDarkTheme : MutableState<Boolean>,
@@ -80,6 +78,7 @@ fun AddContent(
     scope: CoroutineScope,
     settingIconPos: MutableState<Float>,
     rNavController : NavHostController,
+    appPreferences: AppPreferences
 
     ){
     val context = LocalContext.current
@@ -96,7 +95,7 @@ fun AddContent(
                     settingIconPos = if (scaffoldState.drawerState.isOpen) settingIconPos.value else 0.0f
                 )},
             drawerContent = {
-                AddSettingsScreen(isDarkTheme = isDarkTheme, settingIconPos)
+                AddSettingsScreen(isDarkTheme = isDarkTheme, settingIconPos, appPreferences)
             },
             bottomBar = { AddBottomAppBar(rNavController)},
             floatingActionButton = { AddFloatingAction(
@@ -108,7 +107,6 @@ fun AddContent(
                 modifier = Modifier,
             ){
                 val intent = Intent(context, GameConfigActivity::class.java)
-                intent.putExtra("isDarkThemeVal", isDarkTheme.value)
                 context.startActivity(intent)
             }},
             drawerShape = customShape(settingIconPos),
