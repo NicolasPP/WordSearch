@@ -1,15 +1,14 @@
 package com.nicolas.wordsearch.compose
 
+
+import androidx.compose.foundation.Image
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,7 +19,6 @@ import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,23 +27,49 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import com.nicolas.wordsearch.R
 import com.nicolas.wordsearch.compose.themes.colorDarkPalette
 import com.nicolas.wordsearch.compose.themes.colorLightPalette
 import com.nicolas.wordsearch.data.repository.AppPreferences
-import com.nicolas.wordsearch.gamelogic.GameManager
 import com.nicolas.wordsearch.gamelogic.GameLetter
 import com.nicolas.wordsearch.model.GameManagerViewModel
+import kotlinx.coroutines.delay
+import java.lang.Math.floorDiv
 import androidx.compose.foundation.layout.Box as Box
+
+val board = listOf(
+    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+)
 
 class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appPreferences = AppPreferences(this)
-        val gameManModel = GameManagerViewModel()
+        val gameManModel = GameManagerViewModel(board)
         setContent{
-            val isPaused = remember { mutableStateOf(true) }
+            val isPaused = remember { mutableStateOf(false) }
             AddGameContent(
                 isDarkThemeVal = appPreferences.getDarkTheme(),
                 isPaused = isPaused,
@@ -118,7 +142,7 @@ fun AddGameBottomBar(
         ),
         backgroundColor = MaterialTheme.colors.onBackground
     ){
-//        add timer here
+        AddGameTimer(isPaused = isPaused)
     }
 }
 
@@ -180,34 +204,9 @@ fun launchHome(context : Context) {
 fun AddGameScaffoldContent(
     gameManModel: GameManagerViewModel
 ){
-    val testBoard = listOf(
-        listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-        listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-        listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-        listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    )
     val currentSelection = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
     val  pressedList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
-    AddGame(testBoard, gameManModel, pressedList, currentSelection)
+    AddGame(gameManModel.board, gameManModel, pressedList, currentSelection)
 }
 
 @Composable
@@ -221,18 +220,13 @@ fun AddGame(
     val rowSize = board.size
     val colSize = board.get(0).size
     LazyVerticalGrid(columns = GridCells.Fixed(colSize)){
+        val isSelectionValid = gameManModel.isSelectionValid()
         board.forEachIndexed{rowIndex, list ->
             list.forEachIndexed { colIndex, letter ->
-//                Log.d("HOMEAC", "row $rowIndex col $colIndex")
                 val currentLetter = GameLetter(rowIndex, colIndex, letter)
                 val isPresentInState = (currentLetter in pressedList.value)
                 val isInCurrentSelection = (currentLetter in currentWord.value)
-                val isSelectionValid = gameManModel.isSelectionValid()
-                val word = if (isSelectionValid) gameManModel.getPickedWord() else emptyList<GameLetter>()
-                if (isSelectionValid){
-                    gameManModel.addWordLetters()
-                    currentWord.value = word
-                }
+
                 val preCol = if (isSelectionValid) Color.Green else Color.Red
                 val col = if (isPresentInState) preCol else Color.Transparent
                 val c = if (isInCurrentSelection) Color.Blue else col
@@ -244,16 +238,18 @@ fun AddGame(
                         Text(
                             modifier = Modifier
                                 .align(Alignment.Center)
+                                .hoverable(interactionSource = MutableInteractionSource())
                                 .clickable(
                                     enabled = true
-                                ){
+                                ) {
                                     if (isPresentInState) {
-                                        Log.d("HOME", "I AM HERE")
                                         gameManModel.removeLetter(currentLetter)
                                         pressedList.value = gameManModel.getSelection()
-                                    } else{
+                                    } else {
                                         gameManModel.addLetter(currentLetter)
                                         pressedList.value = gameManModel.getSelection()
+                                        gameManModel.addWordLetters()
+                                        currentWord.value = gameManModel.getPickedWord()
                                     }
                                 },
                             text = letter
@@ -271,12 +267,52 @@ fun AddGame(
 fun AddGameProgress(
 
 ){
-//    PUT GAME HERE
+
 }
 
 @Composable
 fun AddGameTimer(
-
+    isPaused : MutableState<Boolean>
 ){
-//    PUT GAME HERE
+
+
+    val timePassed = remember {
+        mutableStateOf(0L)
+    }
+
+    LaunchedEffect(key1 = timePassed.value, key2 = isPaused.value){
+    while (!isPaused.value) {
+        delay(100L)
+        timePassed.value += 100L
+
+    }
+}
+
+
+    Row(
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Image(
+            painter = painterResource(id =R.drawable.outline_timer_24),
+            contentDescription = "Timer",
+            modifier = Modifier,
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.background)
+        )
+        Divider(Modifier.width(15.dp), color= Color.Transparent)
+        Text(
+            modifier = Modifier,
+            text = milliSecsToMin(timePassed.value).toString(),
+            color = MaterialTheme.colors.primary,
+        )
+    }
+}
+
+fun milliSecsToMin(milli: Long): Any {
+    val minutes = milli / 1000 / 60
+    val seconds = milli / 1000 % 60
+    return object {
+        override fun toString() = "$minutes : $seconds"
+    }
 }

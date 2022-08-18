@@ -1,5 +1,6 @@
 package com.nicolas.wordsearch.model
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,7 +27,9 @@ class Offset (val x : Int, val y : Int, val size : Int){
 
 }
 
-class GameManagerViewModel : ViewModel(){
+class GameManagerViewModel (
+    val board : List<List<String>>
+        ) : ViewModel(){
     private val _pickedLetters = MutableLiveData<List<GameLetter>> ()
     private val currentSelection : LiveData<List<GameLetter>> = _pickedLetters
 
@@ -53,6 +56,7 @@ class GameManagerViewModel : ViewModel(){
     }
 
     fun addWordLetters(){
+        if (!isSelectionValid()) return
         val entry = currentSelection.value?.get(0) ?: GameLetter(0,0,"")
         val exit = currentSelection.value?.get(1) ?: GameLetter(0,0,"")
         val offset = Offset.getOffset(entry, exit)
@@ -63,6 +67,7 @@ class GameManagerViewModel : ViewModel(){
             entryRow -= offset.x
             entryCol -= offset.y
         }
+        invalidatePickedLetters()
     }
 
     // getters
@@ -78,8 +83,36 @@ class GameManagerViewModel : ViewModel(){
     // check if picked letters are valid
     // and supporting functions
 
+    fun genBoard() : List<List<String>> {
+        return listOf(
+            listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
+            listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
+            listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
+            listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10")
+        )
+    }
+
     fun isSelectionValid() : Boolean {
-//        if (isSelectionEmpty()) return false
+        if (isSelectionEmpty()) return false
         if (!isSelectionFull()) return false
         if (!isSelectionAligned()) return false
         return true
