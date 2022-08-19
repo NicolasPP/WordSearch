@@ -29,19 +29,26 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.nicolas.wordsearch.*
 import com.nicolas.wordsearch.R
 import com.nicolas.wordsearch.compose.navigation.HomeNavigation
 import com.nicolas.wordsearch.compose.themes.colorDarkPalette
 import com.nicolas.wordsearch.compose.themes.colorLightPalette
+import com.nicolas.wordsearch.data.DataMuseResult
 import com.nicolas.wordsearch.data.repository.AppPreferences
+import com.nicolas.wordsearch.model.WordItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import okio.IOException
 
 const val EN_WIKI : String = "enwiki"
 const val ES_VOCAB : String = "es"
 const val TAG = "HomeActivity"
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), DataMuseResult {
+    var w = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appPreferences = AppPreferences(this)
@@ -49,11 +56,24 @@ class HomeActivity : AppCompatActivity() {
             val isDarkTheme = remember {
                 mutableStateOf(appPreferences.getDarkTheme())
             }
+            //val jsonString = getData(this); val b : List<BoardItem> = Json.decodeFromString(jsonString ?: "")
+            lateinit var jsonString: String
+            try {
+                jsonString = baseContext.assets.open("local_data.json")
+                    .bufferedReader()
+                    .use {it.readText() }
+
+                AppApplication().repository.insertItems(Json.decodeFromString(jsonString))
+            } catch(excep: IOException) {
+
+            }
+
+            //Log.d(TAG, b.toString())
+
             isDarkTheme.value = appPreferences.getDarkTheme()
             val settingIconPos = remember {
                 mutableStateOf(0F)
             }
-
             val rNavController = rememberNavController()
             val scaffoldState = rememberScaffoldState()
             val scope = rememberCoroutineScope()
@@ -68,6 +88,16 @@ class HomeActivity : AppCompatActivity() {
             )
 
         }
+    }
+
+    override fun onDataFetchedSuccess(words: List<WordItem>) {
+        w.add(words[0].word)
+        Log.d(TAG, w.size.toString())
+        Log.d(TAG, w.toString())
+    }
+
+    override fun onDataFetchedFailed() {
+        Log.d(TAG, "fetch failed")
     }
 }
 
@@ -249,7 +279,6 @@ fun AddTopAppBar(
             modifier = Modifier
                 .padding(start = size)
         ){
-            Log.d(TAG, size.toString())
             AddFloatingAction(
                 iconId = R.drawable.menu_48px,
                 dpSize = 50,

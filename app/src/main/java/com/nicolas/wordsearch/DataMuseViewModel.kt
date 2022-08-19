@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nicolas.wordsearch.data.WordProvider
-import com.nicolas.wordsearch.model.WordItem
 import com.nicolas.wordsearch.data.DataMuseResult
+import com.nicolas.wordsearch.model.WordItem
 
 const val TAG = "DataMuseViewModel"
 
@@ -36,18 +36,20 @@ class DataMuseViewModel : ViewModel(), DataMuseResult {
         dataResult : DataMuseResult,
         inputString : String,
         max : Int,
-        vocab : String
+        vocab : String,
+        currentWordIndex : Int
     ){
-        provider.fetchTrailingWords(dataResult, inputString, max,  vocab)
+        provider.fetchTrailingWords(dataResult, inputString, max,  vocab, currentWordIndex)
     }
 
     fun getLeadingWords(
         dataResult : DataMuseResult,
         inputString : String,
         max : Int,
-        vocab : String
+        vocab : String,
+        currentWordIndex : Int
     ){
-        provider.fetchLeadingWords(dataResult, inputString, max,  vocab)
+        provider.fetchLeadingWords(dataResult, inputString, max,  vocab, currentWordIndex)
     }
 
     fun getSynonymousWords(

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -18,7 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -108,13 +112,71 @@ fun AddScaffoldContent(){
             .background(MaterialTheme.colors.background)
             .height(40.dp), color = MaterialTheme.colors.background)
 
-    AddMultiButtonSingleChoice()
+    AddMultiButtonSingleChoice(
+        choiceName = "Local easy puzzles",
+        icon1 = R.drawable.outline_looks_one_24,
+        icon2 = R.drawable.outline_looks_two_24,
+        icon3 = R.drawable.outline_looks_3_24
+    )
+
+    Divider(
+        Modifier
+            .background(MaterialTheme.colors.background)
+            .height(40.dp), color = MaterialTheme.colors.background)
+
+
+    AddMultiButtonSingleChoice(
+        choiceName = "Local Hard puzzles",
+        icon1 = R.drawable.outline_looks_one_24,
+        icon2 = R.drawable.outline_looks_two_24,
+        icon3 = R.drawable.outline_looks_3_24
+    )
+
 
 }
 
 @Composable
-fun AddMultiButtonSingleChoice() {
-
+fun AddMultiButtonSingleChoice(
+    choiceName : String,
+    icon1 : Int,
+    icon2 : Int,
+    icon3 : Int,
+) {
+   Column(
+       modifier = Modifier
+           .fillMaxWidth()
+           .wrapContentHeight(),
+       horizontalAlignment = Alignment.CenterHorizontally,
+       verticalArrangement = Arrangement.Center
+   ) {
+       Text(text = choiceName)
+       Row(
+           modifier = Modifier
+               .fillMaxWidth()
+               .wrapContentHeight(),
+           horizontalArrangement = Arrangement.SpaceAround,
+           verticalAlignment = Alignment.CenterVertically
+       ) {
+           Image(
+               painter = painterResource(id = icon1),
+               contentDescription = "first Option",
+               modifier = Modifier,
+               colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+           )
+           Image(
+               painter = painterResource(id = icon2),
+               contentDescription = "second Option",
+               modifier = Modifier,
+               colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+           )
+           Image(
+               painter = painterResource(id = icon3),
+               contentDescription = "third Option",
+               modifier = Modifier,
+               colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+           )
+       }
+   }
 }
 
 @Composable

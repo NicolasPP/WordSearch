@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
@@ -21,6 +22,7 @@ import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -32,42 +34,17 @@ import com.nicolas.wordsearch.compose.themes.colorDarkPalette
 import com.nicolas.wordsearch.compose.themes.colorLightPalette
 import com.nicolas.wordsearch.data.repository.AppPreferences
 import com.nicolas.wordsearch.gamelogic.GameLetter
+import com.nicolas.wordsearch.getSample
 import com.nicolas.wordsearch.model.GameManagerViewModel
 import kotlinx.coroutines.delay
-import java.lang.Math.floorDiv
 import androidx.compose.foundation.layout.Box as Box
-
-val board = listOf(
-    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6", "8", "9" ,"10","8", "9" ,"10"),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-    listOf("8", "9" ,"10","8", "9" ,"10","8", "9" ,"10","8", "9" ,"10"),
-    listOf("1", "2" ,"3","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10" ),
-    listOf("4", "5" ,"6","4", "5" ,"6","8", "9" ,"10","8", "9" ,"10"),
-)
 
 class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appPreferences = AppPreferences(this)
-        val gameManModel = GameManagerViewModel(board)
+        val gameManModel = GameManagerViewModel(getSample())
+
         setContent{
             val isPaused = remember { mutableStateOf(false) }
             AddGameContent(
@@ -93,11 +70,14 @@ fun AddGameContent(
     isPaused : MutableState<Boolean>,
     gameManModel : GameManagerViewModel
 ){
+    val currentSelection = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
+    val pressedList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
+    val correctList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
     MaterialTheme(
         colors = if (isDarkThemeVal) colorDarkPalette else colorLightPalette
     ){
         Scaffold(
-            bottomBar = { AddGameBottomBar(isPaused = isPaused) },
+            bottomBar = { AddGameBottomBar(isPaused = isPaused, currentSelection, gameManModel) },
             floatingActionButton = {
                 AddFloatingAction(
                     iconId = if (isPaused.value) R.drawable.play_arrow_48px else R.drawable.outline_pause_24,
@@ -122,15 +102,19 @@ fun AddGameContent(
                         bottom = it.calculateBottomPadding()
                     )
             ){
-                AddGameScaffoldContent(gameManModel = gameManModel)
+                AddGameScaffoldContent(gameManModel = gameManModel, pressedList, currentSelection, correctList )
             }
         }
     }
 }
 
+
+
 @Composable
 fun AddGameBottomBar(
-    isPaused: MutableState<Boolean>
+    isPaused: MutableState<Boolean>,
+    currentSelection: MutableState<List<GameLetter>>,
+    gameMan : GameManagerViewModel
 ){
     BottomAppBar(
         modifier = Modifier
@@ -142,8 +126,26 @@ fun AddGameBottomBar(
         ),
         backgroundColor = MaterialTheme.colors.onBackground
     ){
+        var prefix = getLetterString(currentSelection, gameMan)
+        val suffix = " is not on the board"
+        val message = if (prefix.isNotEmpty()) prefix + suffix else prefix
         AddGameTimer(isPaused = isPaused)
+        Divider(modifier = Modifier.width(20.dp))
+        Text(text = message, color = MaterialTheme.colors.primary)
     }
+}
+fun getLetterString(
+    currentSelection : MutableState<List<GameLetter>>,
+    gameMan : GameManagerViewModel
+) : String{
+    var word = ""
+    currentSelection.value.forEach{
+        val (row, col) = it
+        val value = gameMan.board.board[row][col]
+        word += value
+    }
+    Log.d("GAME", word)
+    return word
 }
 
 @Composable
@@ -176,7 +178,7 @@ fun AddGameTopBar(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.outline_arrow_back_24),
-                        contentDescription = "Localized description",
+                        contentDescription = "return",
                         modifier = Modifier
                             .background(
                                 if (isPaused.value) MaterialTheme.colors.onError
@@ -191,9 +193,7 @@ fun AddGameTopBar(
     }
 }
 
-fun doNothing() {
-
-}
+fun doNothing() {}
 
 fun launchHome(context : Context) {
     val intent = Intent(context, GameConfigActivity::class.java)
@@ -202,11 +202,12 @@ fun launchHome(context : Context) {
 
 @Composable
 fun AddGameScaffoldContent(
-    gameManModel: GameManagerViewModel
+    gameManModel: GameManagerViewModel,
+    pressedList: MutableState<List<GameLetter>>,
+    currentSelection: MutableState<List<GameLetter>>,
+    correctList: MutableState<List<GameLetter>>
 ){
-    val currentSelection = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
-    val  pressedList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
-    AddGame(gameManModel.board, gameManModel, pressedList, currentSelection)
+    AddGame(gameManModel.board.board, gameManModel, pressedList, currentSelection, correctList)
 }
 
 @Composable
@@ -214,7 +215,8 @@ fun AddGame(
     board : List<List<String>>,
     gameManModel : GameManagerViewModel,
     pressedList : MutableState<List<GameLetter>>,
-    currentWord : MutableState<List<GameLetter>>
+    currentWord : MutableState<List<GameLetter>>,
+    correctWords : MutableState<List<GameLetter>>
 ){
 
     val rowSize = board.size
@@ -223,37 +225,50 @@ fun AddGame(
         val isSelectionValid = gameManModel.isSelectionValid()
         board.forEachIndexed{rowIndex, list ->
             list.forEachIndexed { colIndex, letter ->
+
                 val currentLetter = GameLetter(rowIndex, colIndex, letter)
                 val isPresentInState = (currentLetter in pressedList.value)
-                val isInCurrentSelection = (currentLetter in currentWord.value)
+                val isInCorrectWords = (currentLetter in correctWords.value)
 
-                val preCol = if (isSelectionValid) Color.Green else Color.Red
-                val col = if (isPresentInState) preCol else Color.Transparent
-                val c = if (isInCurrentSelection) Color.Blue else col
+                Log.d("GAMEMAN", pressedList.value.toString())
                 item(){
+                    val backgroundColor =  if (isPresentInState)  Color.Red else Color.Transparent
+                    val textColor = if (isInCorrectWords)
+                        MaterialTheme.colors.onBackground else MaterialTheme.colors.primary
                     Box(
-                        modifier = Modifier
-                            .border(BorderStroke(1.dp, c))
+                        modifier = Modifier.fillMaxSize()
                     ){
                         Text(
                             modifier = Modifier
                                 .align(Alignment.Center)
-                                .hoverable(interactionSource = MutableInteractionSource())
+                                .background(backgroundColor)
                                 .clickable(
                                     enabled = true
                                 ) {
+//                                    Log.d("GAME",currentWord.value.toString())
+//                                    Log.d("GAME",pressedList.value.toString())
+//                                    Log.d("GAME",correctWords.value.toString())
                                     if (isPresentInState) {
                                         gameManModel.removeLetter(currentLetter)
-                                        pressedList.value = gameManModel.getSelection()
+//                                        pressedList.value = gameManModel.getSelection()
                                     } else {
                                         gameManModel.addLetter(currentLetter)
-                                        pressedList.value = gameManModel.getSelection()
-                                        gameManModel.addWordLetters()
-                                        currentWord.value = gameManModel.getPickedWord()
+//                                        pressedList.value = gameManModel.getSelection()
+//                                        gameManModel.addWordLetters()
+//                                        currentWord.value = gameManModel.getPickedWord()
+//                                        correctWords.value = gameManModel.getCorrectWords()
                                     }
                                 },
-                            text = letter
+                            text = letter,
+                            color = textColor
                         )
+                        if (gameManModel.needsUpdate()){
+//                            gameManModel.addWordLetters()
+                            pressedList.value = gameManModel.getSelection()
+                            currentWord.value = gameManModel.getPickedWord()
+                            correctWords.value = gameManModel.getCorrectWords()
+                            gameManModel.setValidate(false)
+                        }
                     }
                 }
 
@@ -261,7 +276,6 @@ fun AddGame(
         }
     }
 }
-
 
 @Composable
 fun AddGameProgress(
