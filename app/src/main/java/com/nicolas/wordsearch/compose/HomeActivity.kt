@@ -1,5 +1,6 @@
 package com.nicolas.wordsearch.compose
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -350,4 +351,9 @@ fun AddBottomAppBar(nhc : NavHostController){
             )
         }
     }
+}
+
+fun launchHome(context : Context) {
+    val intent = Intent(context, HomeActivity::class.java)
+    context.startActivity(intent)
 }

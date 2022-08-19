@@ -115,7 +115,12 @@ class GameManagerViewModel (
         return false
     }
 
-    private fun isWordValid() : Boolean {
+    fun isDone() : Boolean{
+        if (foundWords.size == board.board.size) return true
+        return false
+    }
+
+    fun isWordValid() : Boolean {
         val letters = getPickedWord()
         var word  = ""
         letters.forEach { gameLetter: GameLetter ->
@@ -125,7 +130,9 @@ class GameManagerViewModel (
         }
         Log.d("GAMEMODEL", word.lowercase())
         if (word.lowercase() in board.words) {
-            foundWords.add(word)
+            if (word !in foundWords){
+                foundWords.add(word)
+            }
             return true
         }
         return false
@@ -143,7 +150,7 @@ class GameManagerViewModel (
         return false
     }
 
-    private fun invalidatePickedLetters() {
+    fun invalidatePickedLetters() {
         _pickedLetters.value = emptyList<GameLetter>()
         setValidate(true)
     }

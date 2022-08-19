@@ -5,11 +5,9 @@ import androidx.compose.foundation.Image
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -22,7 +20,6 @@ import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -47,10 +44,12 @@ class GameActivity : AppCompatActivity() {
 
         setContent{
             val isPaused = remember { mutableStateOf(false) }
-            AddGameContent(
+            val isDone = remember { mutableStateOf(false) }
+            AddMainContent(
                 isDarkThemeVal = appPreferences.getDarkTheme(),
                 isPaused = isPaused,
-                gameManModel = gameManModel
+                gameManModel = gameManModel,
+                isDone = isDone
             )
         }
     }
@@ -65,10 +64,25 @@ object NoRippleTheme : RippleTheme {
 }
 
 @Composable
+fun AddMainContent(
+    isDarkThemeVal: Boolean,
+    isPaused : MutableState<Boolean>,
+    gameManModel : GameManagerViewModel,
+    isDone : MutableState<Boolean>
+){
+    if (!isDone.value){
+        AddGameContent(isDarkThemeVal = isDarkThemeVal, isPaused = isPaused, gameManModel = gameManModel, isDone = isDone)
+    }else{
+        launchHome(LocalContext.current)
+    }
+}
+
+@Composable
 fun AddGameContent(
     isDarkThemeVal : Boolean,
     isPaused : MutableState<Boolean>,
-    gameManModel : GameManagerViewModel
+    gameManModel : GameManagerViewModel,
+    isDone : MutableState<Boolean>
 ){
     val currentSelection = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
     val pressedList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
@@ -103,7 +117,7 @@ fun AddGameContent(
                         bottom = it.calculateBottomPadding()
                     )
             ){
-                AddGameScaffoldContent(gameManModel = gameManModel, pressedList, currentSelection, correctList, foundWordsNum )
+                AddGameScaffoldContent(gameManModel = gameManModel, pressedList, currentSelection, correctList, foundWordsNum, isPaused, isDone)
             }
         }
     }
@@ -115,7 +129,7 @@ fun AddGameContent(
 fun AddGameBottomBar(
     isPaused: MutableState<Boolean>,
     currentSelection: MutableState<List<GameLetter>>,
-    gameMan : GameManagerViewModel
+    gameMan : GameManagerViewModel,
 ){
     BottomAppBar(
         modifier = Modifier
@@ -131,6 +145,15 @@ fun AddGameBottomBar(
         AddGameTimer(isPaused = isPaused)
         Divider(modifier = Modifier.width(20.dp))
         Text(text = word, color = MaterialTheme.colors.primary)
+        Divider(modifier = Modifier.width(20.dp))
+        val check = if (gameMan.isWordValid()) R.drawable.outline_check_24 else R.drawable.outline_clear_24
+        val tint = if (gameMan.isWordValid()) Color.Green else Color.Red
+        if (!currentSelection.value.isEmpty()) {
+            Image(painter = painterResource(id = check), contentDescription = "check", colorFilter = ColorFilter.tint(tint) )
+        }
+        if (isPaused.value){
+            currentSelection.value = emptyList()
+        }
         gameMan.invalidatePickedWord()
     }
 }
@@ -175,7 +198,7 @@ fun AddGameTopBar(
                     modifier = Modifier
                         .size(40.dp),
                     onClick = { if (isPaused.value) doNothing() else
-                        launchHome(context)},
+                        launchGameConfig(context)},
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.outline_arrow_back_24),
@@ -209,7 +232,7 @@ fun AddGameTopBar(
 
 fun doNothing() {}
 
-fun launchHome(context : Context) {
+fun launchGameConfig(context : Context) {
     val intent = Intent(context, GameConfigActivity::class.java)
     context.startActivity(intent)
 }
@@ -220,9 +243,20 @@ fun AddGameScaffoldContent(
     pressedList: MutableState<List<GameLetter>>,
     currentSelection: MutableState<List<GameLetter>>,
     correctList: MutableState<List<GameLetter>>,
-    foundWordsNum : MutableState<Int>
+    foundWordsNum : MutableState<Int>,
+    isPaused : MutableState<Boolean>,
+    isDone : MutableState<Boolean>
 ){
-    AddGame(gameManModel.board.board, gameManModel, pressedList, currentSelection, correctList, foundWordsNum)
+    AddGame(gameManModel.board.board, gameManModel, pressedList, currentSelection, correctList, foundWordsNum, isPaused, isDone)
+    if (isPaused.value){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "GAME PAUSED", color = MaterialTheme.colors.primary)
+        }
+    }
 }
 
 @Composable
@@ -232,7 +266,9 @@ fun AddGame(
     pressedList : MutableState<List<GameLetter>>,
     currentWord : MutableState<List<GameLetter>>,
     correctWords : MutableState<List<GameLetter>>,
-    foundWordsNum : MutableState<Int>
+    foundWordsNum : MutableState<Int>,
+    isPaused: MutableState<Boolean>,
+    isDone : MutableState<Boolean>
 ){
 
     val rowSize = board.size
@@ -246,9 +282,10 @@ fun AddGame(
                 val isInCorrectWords = (currentLetter in correctWords.value)
 
                 item(){
-                    val backgroundColor =  if (isPresentInState)  Color.Red else Color.Transparent
-                    val textColor = if (isInCorrectWords)
+                    val backgroundColor = if (isPresentInState)  MaterialTheme.colors.onBackground else Color.Transparent
+                    val txtColor = if (isInCorrectWords)
                         MaterialTheme.colors.onBackground else MaterialTheme.colors.primary
+                    val textColor = if (isPaused.value) MaterialTheme.colors.secondary else txtColor
                     Box(
                         modifier = Modifier.fillMaxSize()
                     ){
@@ -259,18 +296,21 @@ fun AddGame(
                                 .clickable(
                                     enabled = true
                                 ) {
-                                    if (isPresentInState) {
-                                        gameManModel.removeLetter(currentLetter)
-                                    } else {
-                                        gameManModel.addLetter(currentLetter)
-                                    }
-                                    if (gameManModel.needsUpdate()) {
-                                        gameManModel.addWordLetters()
-                                        foundWordsNum.value = gameManModel.foundWords.size
-                                        pressedList.value = gameManModel.getSelection()
-                                        currentWord.value = gameManModel.getPickedWord()
-                                        correctWords.value = gameManModel.getCorrectWords()
-                                        gameManModel.setValidate(false)
+                                    if (!isPaused.value) {
+                                        if (isPresentInState) {
+                                            gameManModel.removeLetter(currentLetter)
+                                        } else {
+                                            gameManModel.addLetter(currentLetter)
+                                        }
+                                        if (gameManModel.needsUpdate()) {
+                                            gameManModel.addWordLetters()
+                                            foundWordsNum.value = gameManModel.foundWords.size
+                                            pressedList.value = gameManModel.getSelection()
+                                            currentWord.value = gameManModel.getPickedWord()
+                                            correctWords.value = gameManModel.getCorrectWords()
+                                            isDone.value = gameManModel.isDone()
+                                            gameManModel.setValidate(false)
+                                        }
                                     }
                                 },
                             text = letter,
