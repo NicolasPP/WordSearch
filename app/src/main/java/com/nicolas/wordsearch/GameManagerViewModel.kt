@@ -32,7 +32,7 @@ class GameManagerViewModel (
     val board : Board
         ) : ViewModel(){
 
-
+    var foundWords = mutableListOf<String>()
     private val _pickedLetters = MutableLiveData<List<GameLetter>> ()
     private val currentSelection : LiveData<List<GameLetter>> = _pickedLetters
 
@@ -49,11 +49,10 @@ class GameManagerViewModel (
 
     fun addLetter( letter : GameLetter ) {
         if (isSelectionFull()){
-//            invalidatePickedLetters()
-//            invalidatePickedWord()
+            invalidatePickedLetters()
         }else{
             if (letter !in getSelection())
-            _pickedLetters.value = getSelection() + letter}
+                _pickedLetters.value = getSelection() + letter}
         setValidate(true)
         Log.d("GAMEMAN", getSelection().toString())
     }
@@ -78,22 +77,12 @@ class GameManagerViewModel (
         if (isWordValid()) {
             getPickedWord().forEach { gameLetter ->
                 _correctWords.value = getCorrectWords() + gameLetter
-//                invalidatePickedWord()
             }
         }
 
-//        invalidatePickedLetters()
+        invalidatePickedLetters()
     }
     // getters
-    fun getPickedWordString() : String {
-        val letters = getPickedWord()
-        var result = ""
-        letters.forEach{
-            val (row, col) = it
-            result += board.board[row][col]
-        }
-        return result
-    }
     fun getPickedWord() : List<GameLetter> {
         return pickedWord.value ?: emptyList()
     }
@@ -135,7 +124,10 @@ class GameManagerViewModel (
             word = word.plus(value)
         }
         Log.d("GAMEMODEL", word.lowercase())
-        if (word.lowercase() in board.words) return true
+        if (word.lowercase() in board.words) {
+            foundWords.add(word)
+            return true
+        }
         return false
     }
 
@@ -156,7 +148,7 @@ class GameManagerViewModel (
         setValidate(true)
     }
 
-    private fun invalidatePickedWord() {
+    fun invalidatePickedWord() {
         _pickedWord.value = emptyList<GameLetter>()
         setValidate(true)
     }

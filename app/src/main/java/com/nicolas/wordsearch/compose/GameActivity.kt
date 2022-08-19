@@ -73,6 +73,7 @@ fun AddGameContent(
     val currentSelection = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
     val pressedList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
     val correctList = remember { mutableStateOf<List<GameLetter>>( emptyList() )}
+    val foundWordsNum = remember { mutableStateOf(0) }
     MaterialTheme(
         colors = if (isDarkThemeVal) colorDarkPalette else colorLightPalette
     ){
@@ -89,7 +90,7 @@ fun AddGameContent(
                 ){
                     isPaused.value = ! isPaused.value
                 }},
-            topBar = { AddGameTopBar(isPaused = isPaused) },
+            topBar = { AddGameTopBar(isPaused = isPaused, wordCount = gameManModel.board.words.size, foundWordsNum) },
             floatingActionButtonPosition = FabPosition.End,
             isFloatingActionButtonDocked = true,
         ) {
@@ -102,7 +103,7 @@ fun AddGameContent(
                         bottom = it.calculateBottomPadding()
                     )
             ){
-                AddGameScaffoldContent(gameManModel = gameManModel, pressedList, currentSelection, correctList )
+                AddGameScaffoldContent(gameManModel = gameManModel, pressedList, currentSelection, correctList, foundWordsNum )
             }
         }
     }
@@ -126,12 +127,11 @@ fun AddGameBottomBar(
         ),
         backgroundColor = MaterialTheme.colors.onBackground
     ){
-        var prefix = getLetterString(currentSelection, gameMan)
-        val suffix = " is not on the board"
-        val message = if (prefix.isNotEmpty()) prefix + suffix else prefix
+        var word = getLetterString(currentSelection, gameMan)
         AddGameTimer(isPaused = isPaused)
         Divider(modifier = Modifier.width(20.dp))
-        Text(text = message, color = MaterialTheme.colors.primary)
+        Text(text = word, color = MaterialTheme.colors.primary)
+        gameMan.invalidatePickedWord()
     }
 }
 fun getLetterString(
@@ -144,13 +144,14 @@ fun getLetterString(
         val value = gameMan.board.board[row][col]
         word += value
     }
-    Log.d("GAME", word)
     return word
 }
 
 @Composable
 fun AddGameTopBar(
-    isPaused: MutableState<Boolean>
+    isPaused: MutableState<Boolean>,
+    wordCount : Int,
+    foundWordsNum : MutableState<Int>
 ){
     val context = LocalContext.current
     TopAppBar(
@@ -161,9 +162,9 @@ fun AddGameTopBar(
             .background(MaterialTheme.colors.onBackground)
             .padding(start = 8.dp, end = 8.dp)
     ){
-        Column(
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Row(
+//            horizontalArrangement = Arrangement.spacedBy(50.dp),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(start = 10.dp)
         ){
@@ -172,7 +173,7 @@ fun AddGameTopBar(
             ){
                 FloatingActionButton(
                     modifier = Modifier
-                        .size(56.dp),
+                        .size(40.dp),
                     onClick = { if (isPaused.value) doNothing() else
                         launchHome(context)},
                 ) {
@@ -184,9 +185,22 @@ fun AddGameTopBar(
                                 if (isPaused.value) MaterialTheme.colors.onError
                                 else MaterialTheme.colors.primary
                             )
-                            .size(56.dp),
+                            .size(40.dp),
                         colorFilter = ColorFilter.tint( if (isPaused.value) MaterialTheme.colors.onError
                         else MaterialTheme.colors.background))
+                }
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                        ){
+
+                    val text = foundWordsNum.value.toString() + " / $wordCount"
+                    Text(
+                        modifier = Modifier,
+                        text = text,
+                        color = Color.White,
+                    )
                 }
             }
         }
@@ -205,9 +219,10 @@ fun AddGameScaffoldContent(
     gameManModel: GameManagerViewModel,
     pressedList: MutableState<List<GameLetter>>,
     currentSelection: MutableState<List<GameLetter>>,
-    correctList: MutableState<List<GameLetter>>
+    correctList: MutableState<List<GameLetter>>,
+    foundWordsNum : MutableState<Int>
 ){
-    AddGame(gameManModel.board.board, gameManModel, pressedList, currentSelection, correctList)
+    AddGame(gameManModel.board.board, gameManModel, pressedList, currentSelection, correctList, foundWordsNum)
 }
 
 @Composable
@@ -216,13 +231,13 @@ fun AddGame(
     gameManModel : GameManagerViewModel,
     pressedList : MutableState<List<GameLetter>>,
     currentWord : MutableState<List<GameLetter>>,
-    correctWords : MutableState<List<GameLetter>>
+    correctWords : MutableState<List<GameLetter>>,
+    foundWordsNum : MutableState<Int>
 ){
 
     val rowSize = board.size
     val colSize = board.get(0).size
     LazyVerticalGrid(columns = GridCells.Fixed(colSize)){
-        val isSelectionValid = gameManModel.isSelectionValid()
         board.forEachIndexed{rowIndex, list ->
             list.forEachIndexed { colIndex, letter ->
 
@@ -230,7 +245,6 @@ fun AddGame(
                 val isPresentInState = (currentLetter in pressedList.value)
                 val isInCorrectWords = (currentLetter in correctWords.value)
 
-                Log.d("GAMEMAN", pressedList.value.toString())
                 item(){
                     val backgroundColor =  if (isPresentInState)  Color.Red else Color.Transparent
                     val textColor = if (isInCorrectWords)
@@ -245,30 +259,23 @@ fun AddGame(
                                 .clickable(
                                     enabled = true
                                 ) {
-//                                    Log.d("GAME",currentWord.value.toString())
-//                                    Log.d("GAME",pressedList.value.toString())
-//                                    Log.d("GAME",correctWords.value.toString())
                                     if (isPresentInState) {
                                         gameManModel.removeLetter(currentLetter)
-//                                        pressedList.value = gameManModel.getSelection()
                                     } else {
                                         gameManModel.addLetter(currentLetter)
-//                                        pressedList.value = gameManModel.getSelection()
-//                                        gameManModel.addWordLetters()
-//                                        currentWord.value = gameManModel.getPickedWord()
-//                                        correctWords.value = gameManModel.getCorrectWords()
+                                    }
+                                    if (gameManModel.needsUpdate()) {
+                                        gameManModel.addWordLetters()
+                                        foundWordsNum.value = gameManModel.foundWords.size
+                                        pressedList.value = gameManModel.getSelection()
+                                        currentWord.value = gameManModel.getPickedWord()
+                                        correctWords.value = gameManModel.getCorrectWords()
+                                        gameManModel.setValidate(false)
                                     }
                                 },
                             text = letter,
                             color = textColor
                         )
-                        if (gameManModel.needsUpdate()){
-//                            gameManModel.addWordLetters()
-                            pressedList.value = gameManModel.getSelection()
-                            currentWord.value = gameManModel.getPickedWord()
-                            correctWords.value = gameManModel.getCorrectWords()
-                            gameManModel.setValidate(false)
-                        }
                     }
                 }
 

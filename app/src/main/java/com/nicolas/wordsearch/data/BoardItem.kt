@@ -12,7 +12,7 @@ data class BoardItem (
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     @field:TypeConverters(LeadingConverter::class)
-    val Leading: List<Leading>,
+    val leading: List<Leading>,
     @field:TypeConverters(SynonymConverter::class)
-    val Synonymous: List<Synonymous>
+    val synonymous: List<Synonymous>
 )

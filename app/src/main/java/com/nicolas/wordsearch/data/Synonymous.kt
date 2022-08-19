@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Synonymous(
-    //val Board: List<List<String>>,
-    val Input: String,
-    val Size: Int,
-    //val Words: List<String>
+    val board: List<String>,
+    val input: String,
+    val size: Int,
+    val words: List<String>
 )

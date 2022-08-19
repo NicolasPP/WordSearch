@@ -56,17 +56,17 @@ class HomeActivity : AppCompatActivity(), DataMuseResult {
             val isDarkTheme = remember {
                 mutableStateOf(appPreferences.getDarkTheme())
             }
-            //val jsonString = getData(this); val b : List<BoardItem> = Json.decodeFromString(jsonString ?: "")
-            lateinit var jsonString: String
-            try {
-                jsonString = baseContext.assets.open("local_data.json")
-                    .bufferedReader()
-                    .use {it.readText() }
-
-                AppApplication().repository.insertItems(Json.decodeFromString(jsonString))
-            } catch(excep: IOException) {
-
-            }
+//            val jsonString = getData(this); val b : List<BoardItem> = Json.decodeFromString(jsonString ?: "")
+//            lateinit var jsonString: String
+//            try {
+//                jsonString = baseContext.assets.open("local_data.json")
+//                    .bufferedReader()
+//                    .use {it.readText() }
+//
+//                AppApplication().repository.insertItems(Json.decodeFromString(jsonString))
+//            } catch(excep: IOException) {
+//
+//            }
 
             //Log.d(TAG, b.toString())
 
