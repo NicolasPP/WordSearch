@@ -1,5 +1,6 @@
 package com.nicolas.wordsearch.data
 
+import android.os.Parcelable
 import kotlinx.serialization.Serializable
 
 @Serializable

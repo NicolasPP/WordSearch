@@ -60,6 +60,7 @@ class GameManagerViewModel (
     fun removeLetter( letter : GameLetter ) {
         if(!isSelectionEmpty())
             _pickedLetters.value = getSelection() - letter
+        invalidatePickedLetters()
     }
 
     fun addWordLetters() {
